@@ -1,15 +1,9 @@
 
 Refactor:
-    debug mode?
     names
-    pick consistent policy for [x][y] or [y][x]
     utily for drawing rects
-    pick consistent policy for settings screen in other modules and error handling if not settings
     the using by color for grid safety check
-    add more comments for the "Imagined new reader"
+    add more comments
     
-
 add gui
-    add next tetronimo
     add score
-add sound

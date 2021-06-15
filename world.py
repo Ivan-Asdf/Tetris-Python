@@ -1,6 +1,9 @@
 import pygame
 
-TILE_SIZE  = 32
+import sound
+import tetromino
+
+TILE_SIZE  = 40
 
 SCREEN_WIDTH = 20
 SCREEN_HEIGHT = 22
@@ -35,6 +38,7 @@ class World:
                 for y1 in range(y - 1, -1, -1):
                     for x1 in range(0, GAME_WIDTH):
                         grid[y1 + 1][x1] = grid[y1][x1]
+                sound.play_sound("rotation")
 
     def render(self):
         for y in range(0, GAME_HEIGHT):
@@ -42,4 +46,7 @@ class World:
                 r = pygame.Rect((game_start_x + TILE_SIZE*x, game_start_y + TILE_SIZE*y), (TILE_SIZE, TILE_SIZE))
                 color = grid[y][x]
                 pygame.draw.rect(self.screen, color, r)
-                pygame.draw.rect(self.screen, GRID_COLOR_BORDER, r, 2)
+                if color != GRID_COLOR_FILL:
+                    pygame.draw.rect(self.screen, tetromino.BORDER_COLOR, r, 2)
+                else:
+                    pygame.draw.rect(self.screen, GRID_COLOR_BORDER, r, 2)

@@ -10,7 +10,6 @@ gui_start_y = GUI_PLACEMENT[1] * world.TILE_SIZE
 def show_next_tetromino(screen):
     if len(tetromino.tetromino_set) > 0:
         type = tetromino.tetromino_set[0].type
-        print(type)
 
         # Render a grid
         for y in range(0, 4):
@@ -28,3 +27,4 @@ def show_next_tetromino(screen):
                 ,(world.TILE_SIZE, world.TILE_SIZE))
 
             pygame.draw.rect(screen, tetromino.colors[type], r)
+            pygame.draw.rect(screen, tetromino.BORDER_COLOR, r, 2)

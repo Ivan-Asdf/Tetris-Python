@@ -1,18 +1,10 @@
-# from enum import Enum
 import random
 import copy
 
 import pygame
 import world
+import sound
 
-# class TetrominoType(Enum):
-#     I = 1,
-#     T = 2,
-#     J = 3,
-#     L = 4,
-#     Z = 5,
-#     S = 6,
-#     O = 7
 
 spawns = [
     [(1, 1), (2, 1), (0, 1), (3, 1)],   # I
@@ -23,6 +15,8 @@ spawns = [
     [(1, 1), (1, 0), (0, 0), (2, 1)],   # S
     [(1, 1), (2, 0), (1, 0), (2, 1)],   # O
 ]
+
+BORDER_COLOR = (0, 0, 0)
 
 colors = [
     (15, 65, 214),
@@ -54,7 +48,7 @@ def gen_tetromino_set():
     
     for type in type_list:
         t = Tetromino(type)
-        t.move(3, -2)
+        t.move_no_coll(3, -2)
         # tetromino_set.append(t)
         tetromino_set.insert(0,t)
 
@@ -62,11 +56,13 @@ def lock_tetromino(tetromino):
     for tile in tetromino.tiles:
         if tile[1] < 0:
             print("GAME OVER")
+            sound.play_sound("game_over")
+            pygame.time.delay(2000)
             exit(0)
         world.grid[tile[1]][tile[0]] = tetromino.color;
     return get_tetromino()
 
-def getGhostTetromino(t):
+def get_ghost_tetromino(t):
     t = copy.deepcopy(t)
     t.is_ghost = True
     while not t.check_collision():
@@ -77,7 +73,7 @@ def getGhostTetromino(t):
     return t
 
 def hard_drop_tetronimo(t):
-    t = getGhostTetromino(t)
+    t = get_ghost_tetromino(t)
     return lock_tetromino(t)
 
 class Tetromino:
@@ -104,13 +100,19 @@ class Tetromino:
             if (y >= 1):
                 pygame.event.post(pygame.event.Event(REACHED_FLOOR))
 
+        sound.play_sound("movement")
+
     def render(self):
         for tile in self.tiles:
-            r = pygame.Rect((world.game_start_x + 32*tile[0], world.game_start_y + 32*tile[1]), (32, 32))
+            if tile[1] < 0:
+                continue;
+            r = pygame.Rect((world.game_start_x + world.TILE_SIZE*tile[0], world.game_start_y + world.TILE_SIZE*tile[1]),\
+                 (world.TILE_SIZE, world.TILE_SIZE))
             if (not self.is_ghost):
                 pygame.draw.rect(screen, self.color, r)
+                pygame.draw.rect(screen, BORDER_COLOR, r, 2)
             else:
-                pygame.draw.rect(screen, self.color, r, 3)
+                pygame.draw.rect(screen, self.color, r, 2)
 
     def check_collision(self):
         for tile in self.tiles:
@@ -129,6 +131,9 @@ class Tetromino:
         return False
 
     def rotate(self, rotation):
+        # Block shaped 2x2 tetromino does not rotate
+        if self.type == 6:
+            return
         # https:#tetris.fandom.com/wiki/SRS?file=SRS-pieces.png
         # Special shift for when rotation "I" tetromino
         if self.type == 0:
@@ -187,6 +192,7 @@ class Tetromino:
             else:
                 # Succefully rotated with no collision
                 self.rotation_state = rotate_to
+                sound.play_sound("rotation")
                 return
         
         print("ERROR: ROTATION FAILED")
@@ -201,11 +207,11 @@ def get_wallkick_offsets(rotate_from, rotate_to, type):
     
     index = index_base + index_add
     if type == 0:
-        return kickDataI[index]
+        return kick_data_I[index]
 
-    return kickData[index]
+    return kick_data[index]
 
-kickData = [
+kick_data = [
     [(0, 0), (1, 0), (1, -1), (0, 2), (1, 2)],      # 0 -> 3
     [(0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2)],   # 0 -> 1
     [(0, 0), (1, 0), (1, 1), (0, -2), (1, -1)],     # 1 -> 0
@@ -217,7 +223,7 @@ kickData = [
 ]
 
 # Special kickdata from "I" tetromino
-kickDataI =[
+kick_data_I =[
     [(0, 0), (-1, 0), (2, 0), (-1, -2), (2, 1)],    # 0 -> 4
     [(0, 0), (-2, 0), (1, 0), (-2, 1), (1, -2)],    # 0 -> 1
     [(0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2)],    # 1 -> 0
