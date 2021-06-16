@@ -1,15 +1,4 @@
-from enum import Enum
-import enum
-
 import pygame
-
-# Sound = Enum(
-#     MOVEMENT = 1,
-#     ROTATION = 2,
-#     LINE_CLEAR = 3,
-#     HARD_DROP = 4,
-#     GAME_OVER = 5
-# )
 
 pygame.mixer.music.set_volume(0.03)
 

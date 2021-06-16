@@ -123,6 +123,6 @@ while running:
     gui.show_next_tetromino(screen)
 
     pygame.display.flip()
-    clock.tick(30)
+    clock.tick(60)
 
 pygame.quit()

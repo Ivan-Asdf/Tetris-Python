@@ -43,13 +43,11 @@ def get_tetromino():
 
 def gen_tetromino_set():
     type_list = list(range(0, 7))
-    # random.shuffle(type_list)
+    random.shuffle(type_list)
 
-    
     for type in type_list:
         t = Tetromino(type)
         t.move_no_coll(3, -2)
-        # tetromino_set.append(t)
         tetromino_set.insert(0,t)
 
 def lock_tetromino(tetromino):
@@ -95,7 +93,6 @@ class Tetromino:
         
         if self.check_collision():
             self.tiles = prev_tiles
-            # print("new", self.tiles)
             # raised reached floor event
             if (y >= 1):
                 pygame.event.post(pygame.event.Event(REACHED_FLOOR))
@@ -183,12 +180,14 @@ class Tetromino:
             rotate_to = 3
 
         # The offsets to be tried to avoid collision
-        offsets = get_wallkick_offsets(rotate_from, rotate_to, type)
+        offsets = get_wallkick_offsets(rotate_from, rotate_to, self.type)
         orig_tiles = self.tiles.copy()
         for offset in offsets:
+            print("From: ", rotate_from, "To: ", rotate_to)
+            print("Trying offset: ", offset)
             self.move_no_coll(offset[0], offset[1])
             if self.check_collision():
-                self.tiles = orig_tiles
+                self.tiles = orig_tiles.copy()
             else:
                 # Succefully rotated with no collision
                 self.rotation_state = rotate_to
